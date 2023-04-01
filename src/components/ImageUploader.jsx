@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 
-const ImageUploader = () => {
+const ImageUploader = (props) => {
+  const { convertImage } = props;
   const fileUploadRef = useRef();
 
   const [state, setState] = useState({
@@ -88,7 +89,11 @@ const ImageUploader = () => {
             />
           </div>
         )}
-        {state.file && <button className="convert">Convert</button>}
+        {state.file && (
+          <button className="convert" onClick={() => convertImage(state.file)}>
+            Convert
+          </button>
+        )}
       </div>
     </>
   );
