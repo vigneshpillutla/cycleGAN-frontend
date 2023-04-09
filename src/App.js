@@ -1,18 +1,28 @@
 import { useState } from 'react';
 import './App.css';
 import ImageUploader from './components/ImageUploader';
+import DisplayResult from './components/DisplayResult';
 
 function App() {
   const [state, setState] = useState({
     loading: false,
     uploaded: false,
-    imageURL: null
+    imageData: {
+      source: {
+        type: 'CT',
+        url: 'https://pbs.twimg.com/profile_images/949787136030539782/LnRrYf6e_400x400.jpg'
+      },
+      target: {
+        type: 'MRI',
+        url: 'https://images01.military.com/sites/default/files/styles/full/public/2019-09/MightyStocklead1200.jpg'
+      }
+    }
   });
 
-  const convertImage = async (sourceScan) => {
-    debugger;
+  const convertImage = async (sourceScan, sourceType) => {
     let formData = new FormData();
     formData.append('file', sourceScan);
+    formData.append('type', sourceType);
     console.log(formData.entries);
 
     const response = await fetch('http://localhost:5000', {
@@ -20,36 +30,34 @@ function App() {
       body: formData
     });
 
-    // For binary image response
-    // const data = await response.blob();
-    // console.log(data);
-    // console.log(URL.createObjectURL(data));
-    // setState({
-    //   loading: false,
-    //   uploaded: true,
-    //   imageURL: `${URL.createObjectURL(data)}`
-    // });
+    const convertedType = {
+      CT: 'MRI',
+      MRI: 'CT'
+    };
 
     // For json response, base64 encoded
     const data = await response.json();
-    console.log(data);
     setState({
       loading: false,
       uploaded: true,
-      imageURL: `data:image/jpeg;base64, ${data.image}`
+      imageData: {
+        source: {
+          type: sourceType,
+          url: `${URL.createObjectURL(sourceScan)}`
+        },
+        target: {
+          type: convertedType[sourceType],
+          url: `data:image/jpeg;base64, ${data.image}`
+        }
+      }
     });
   };
 
   return (
     <div className="App">
       <header className="App-header">
-        {state.imageURL ? (
-          <>
-            <img src={state.imageURL} alt="" />
-            <a href={state.imageURL} download="scan.jpg">
-              Download
-            </a>
-          </>
+        {state.uploaded ? (
+          <DisplayResult imageData={state.imageData} />
         ) : (
           <ImageUploader convertImage={convertImage} />
         )}

@@ -6,7 +6,8 @@ const ImageUploader = (props) => {
 
   const [state, setState] = useState({
     file: null,
-    url: null
+    url: null,
+    type: 'CT'
   });
 
   const handleBrowse = () => {
@@ -15,10 +16,11 @@ const ImageUploader = (props) => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setState({
+    setState((prev) => ({
+      ...prev,
       file,
       url: URL.createObjectURL(file)
-    });
+    }));
   };
 
   const handleDragOver = (e) => {
@@ -33,10 +35,18 @@ const ImageUploader = (props) => {
     e.preventDefault();
     e.stopPropagation();
     const file = e.dataTransfer.files[0];
-    setState({
+    setState((prev) => ({
+      ...prev,
       file,
       url: URL.createObjectURL(file)
-    });
+    }));
+  };
+
+  const handleTypeChange = (e) => {
+    setState((prev) => ({
+      ...prev,
+      type: e.target.value
+    }));
   };
 
   return (
@@ -50,7 +60,7 @@ const ImageUploader = (props) => {
       >
         {state.file ? (
           <img
-            style={{ width: '100%', height: '90%', objectFit: 'contain' }}
+            style={{ width: '100%', height: '350px', objectFit: 'contain' }}
             src={state.url}
             alt=""
           />
@@ -90,9 +100,19 @@ const ImageUploader = (props) => {
           </div>
         )}
         {state.file && (
-          <button className="convert" onClick={() => convertImage(state.file)}>
-            Convert
-          </button>
+          <>
+            <select value={state.type} onChange={handleTypeChange}>
+              <option value="CT">CT</option>
+              <option value="MRI">MRI</option>
+            </select>
+            <br />
+            <button
+              className="action-btn"
+              onClick={() => convertImage(state.file, state.type)}
+            >
+              Convert
+            </button>
+          </>
         )}
       </div>
     </>
