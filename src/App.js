@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './App.css';
 import ImageUploader from './components/ImageUploader';
 import DisplayResult from './components/DisplayResult';
+import LoadingScreen from './components/LoadingScreen';
 
 function App() {
   const [state, setState] = useState({
@@ -25,6 +26,8 @@ function App() {
     formData.append('type', sourceType);
     console.log(formData.entries);
 
+    setState((prev) => ({ ...prev, loading: true }));
+
     const response = await fetch('http://localhost:5000', {
       method: 'POST',
       body: formData
@@ -47,11 +50,15 @@ function App() {
         },
         target: {
           type: convertedType[sourceType],
-          url: `data:image/jpeg;base64, ${data.image}`
+          url: `data:image/png;base64, ${data.image}`
         }
       }
     });
   };
+
+  if (state.loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="App">

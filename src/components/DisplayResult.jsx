@@ -25,7 +25,7 @@ const DisplayResult = (props) => {
           <button className="action-btn">
             <a
               href={target.url}
-              download="scan.jpg"
+              download="scan.png"
               style={{
                 textDecoration: 'none',
                 color: 'inherit'
